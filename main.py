@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+
 import pygame
 import pygwrap
 import maps
@@ -6,6 +10,7 @@ import image
 import monster
 import rpgmenu
 import backdrop
+import editor
 
 pygame.init()
 
@@ -30,6 +35,7 @@ mymenu = rpgmenu.Menu( screen , 150 , 280 , 340 , 170 )
 mymenu.predraw = predraw
 
 mymenu.add_item( "Play Game" , 1 )
+mymenu.add_item( "Edit Map" , 2 )
 mymenu.add_item( "Quit" , -1 )
 
 keep_going = True
@@ -58,6 +64,10 @@ while keep_going:
         the_level.contents.append( slime )
 
         the_level.play( pc , screen )
+
+    elif n == 2:
+        the_level = maps.Map(width=25,height=16)
+        editor.edit_map( the_level , screen )
 
     elif n == -1:
         keep_going = False

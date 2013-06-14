@@ -35,6 +35,12 @@ class Image( object ):
         area = pygame.Rect( area_x , area_y , self.frame_width , self.frame_height )
         screen.blit(self.bitmap , dest , area )
 
+    def num_frames( self ):
+        frames_per_row = self.bitmap.get_width() / self.frame_width
+        frames_per_column = self.bitmap.get_height() / self.frame_height
+        return frames_per_row * frames_per_column
+
+
     def __reduce__( self ):
         # Rather than trying to save the bitmap image, just save the filename.
         return Image, ( self.fname , self.width , self.height )

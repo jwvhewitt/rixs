@@ -149,6 +149,21 @@ def render_text(font, text, width, color = (255,255,255) ):
     s.set_colorkey((0,0,0),pygame.RLEACCEL)
     return s
 
+def input_string( screen , font , redrawer = None ):
+    it = []
+    keep_going = True
+    while keep_going:
+        ev = pygwrap.wait_event()
+
+        if ev.type == pygwrap.TIMEREVENT:
+            if redrawer != None:
+                redrawer( screen )
+        elif ev.type == pygame.KEYDOWN:
+            if ( ev.key == pygame.K_BACKSPACE ) and ( len( it ) > 0 ):
+                del it[-1]
+            else:
+                it.append( ev.unicode )
+
 
 def init():
     global INIT_DONE

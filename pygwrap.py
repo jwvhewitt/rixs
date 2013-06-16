@@ -21,6 +21,7 @@ except ImportError:
 
 WRAP_BACKGROUND = None
 WRAP_BORDERS = None
+INPUT_CURSOR = None
 
 TEX_WIDTH = 16
 BORDER_WIDTH = 8
@@ -149,28 +150,44 @@ def render_text(font, text, width, color = (255,255,255) ):
     s.set_colorkey((0,0,0),pygame.RLEACCEL)
     return s
 
+ALLOWABLE_CHARACTERS = u'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890()-=_+,.?"'
+
 def input_string( screen , font , redrawer = None ):
     it = []
     keep_going = True
-    while keep_going:
-        ev = pygwrap.wait_event()
 
-        if ev.type == pygwrap.TIMEREVENT:
+    myrect = pygame.Rect( screen.get_width() / 2 - 200 , screen.get_height() / 2 - 32 , 400 , 64 )
+
+    while keep_going:
+        ev = wait_event()
+
+        if ev.type == TIMEREVENT:
             if redrawer != None:
                 redrawer( screen )
+            draw_border( screen , myrect )
+            mystring = "".join( it )
+            myimage = font.render( mystring, True, (255,255,255) )
+            screen.blit( myimage , myrect )
+            pygame.display.flip()
+
+
         elif ev.type == pygame.KEYDOWN:
             if ( ev.key == pygame.K_BACKSPACE ) and ( len( it ) > 0 ):
                 del it[-1]
-            else:
+            elif ( ev.key == pygame.K_RETURN ) or ( ev.key == pygame.K_ESCAPE ):
+                keep_going = False
+            elif ev.unicode in ALLOWABLE_CHARACTERS:
                 it.append( ev.unicode )
+    return "".join( it )
 
 
 def init():
     global INIT_DONE
     if not INIT_DONE:
-        global WRAP_BACKGROUND, WRAP_BORDERS
+        global WRAP_BACKGROUND, WRAP_BORDERS, INPUT_CURSOR
         WRAP_BACKGROUND = image.Image( "sys_defbackground.png" , TEX_WIDTH , TEX_WIDTH )
         WRAP_BORDERS = image.Image( "sys_defborder.png" , BORDER_WIDTH , BORDER_WIDTH )
+        INPUT_CURSOR = image.Image( "sys_textcursor.png" , 8 , 16 )
 
         if android:
             android.init()

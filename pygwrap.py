@@ -152,11 +152,13 @@ def render_text(font, text, width, color = (255,255,255) ):
 
 ALLOWABLE_CHARACTERS = u'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890()-=_+,.?"'
 
-def input_string( screen , font , redrawer = None ):
+def input_string( screen , font , redrawer = None, prompt = "Enter text below", prompt_color = (255,255,255), input_color = (240,240,50) ):
     it = []
     keep_going = True
+    cursor_frame = 1
 
     myrect = pygame.Rect( screen.get_width() / 2 - 200 , screen.get_height() / 2 - 32 , 400 , 64 )
+    prompt_image = font.render( prompt, True, prompt_color )
 
     while keep_going:
         ev = wait_event()
@@ -166,8 +168,13 @@ def input_string( screen , font , redrawer = None ):
                 redrawer( screen )
             draw_border( screen , myrect )
             mystring = "".join( it )
-            myimage = font.render( mystring, True, (255,255,255) )
-            screen.blit( myimage , myrect )
+            myimage = font.render( mystring, True, input_color )
+            screen.blit( prompt_image , ( screen.get_width() / 2 - prompt_image.get_width() / 2 , screen.get_height() / 2 - prompt_image.get_height() - 2 ) )
+            screen.set_clip( myrect )
+            screen.blit( myimage , ( screen.get_width() / 2 - myimage.get_width() / 2 , screen.get_height() / 2 ) )
+            INPUT_CURSOR.render( screen , ( screen.get_width() / 2 + myimage.get_width() / 2 + 2 , screen.get_height() / 2 ) , cursor_frame / 3 )
+            screen.set_clip( None )
+            cursor_frame = ( cursor_frame + 1 ) % ( INPUT_CURSOR.num_frames() * 3 )
             pygame.display.flip()
 
 
@@ -176,8 +183,10 @@ def input_string( screen , font , redrawer = None ):
                 del it[-1]
             elif ( ev.key == pygame.K_RETURN ) or ( ev.key == pygame.K_ESCAPE ):
                 keep_going = False
-            elif ev.unicode in ALLOWABLE_CHARACTERS:
+            elif ( ev.unicode in ALLOWABLE_CHARACTERS ) and ( len( ev.unicode ) > 0 ):
                 it.append( ev.unicode )
+        elif ev.type == pygame.QUIT:
+            keep_going = False
     return "".join( it )
 
 

@@ -1,5 +1,6 @@
 import pygame
 import pygwrap
+import glob
 
 
 MENUFONT = None
@@ -195,6 +196,11 @@ class Menu( pygame.Rect ):
             key_num += 1
             if key_num >= len( self.alpha_key_sequence ):
                 break
+
+    def add_files( self , filepat ):
+        file_list = glob.glob( filepat )
+        for f in file_list:
+            self.add_item( f , f )
 
 def init():
     # Don't call init until after the display has been set.

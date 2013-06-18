@@ -9,7 +9,6 @@ import player
 import image
 import monster
 import rpgmenu
-import backdrop
 import editor
 
 pygame.init()
@@ -20,7 +19,7 @@ pygwrap.init()
 rpgmenu.init()
 pygame.display.set_caption( "~= RIXS =~" , "RIXS" )
 
-TITLE_BG = backdrop.Backdrop( "bg_wests_rock5.png" )
+TITLE_BG = image.Image( "bg_wests_rock5.png" )
 TITLE_LOGO = image.Image( "logo.png" )
 TITLE_COUNTER = 0
 
@@ -46,7 +45,7 @@ while keep_going:
     n = mymenu.query()
 
     if n == 1:
-        the_level = maps.Map(width=25,height=16)
+        the_level = maps.load( "gorch.dat" )
         pc = player.Player( x = 100, y=360 )
         # Start the player with a bit of bounce...
         pc.dy = -10
@@ -67,8 +66,7 @@ while keep_going:
         the_level.play( pc , screen )
 
     elif n == 2:
-        the_level = maps.Map(width=25,height=16)
-        editor.edit_map( the_level , screen )
+        editor.create_new_level( screen )
 
     elif n == 3:
         a = pygwrap.input_string( screen , rpgmenu.MENUFONT , predraw )

@@ -136,7 +136,8 @@ def wrap_multi_line(text, font, maxwidth):
     return list(lines)
 
 
-def render_text(font, text, width, color = (255,255,255) ):
+def render_text(font, text, width, color = (255,255,255), do_center= False ):
+    # Return an image with prettyprinted text.
     lines = wrap_multi_line( text , font , width )
 
     imgs = [ font.render(l, True, color ) for l in lines]
@@ -145,14 +146,31 @@ def render_text(font, text, width, color = (255,255,255) ):
     s.fill((0,0,0))
     o = 0
     for i in imgs:
-        s.blit(i,(0,o))
+        if do_center:
+            x = width/2 - i.get_width()/2
+        else:
+            x = 0
+        s.blit(i,(x,o))
         o += i.get_height()
     s.set_colorkey((0,0,0),pygame.RLEACCEL)
     return s
 
+def draw_text( screen , font , text , rect , color = (255,255,255), do_center= False ):
+    # Draw some text to the screen with the provided options.
+    myimage = render_text( font , text , rect.width , color , do_center )
+    if do_center:
+        myrect = myimage.get_rect( center = rect.center )
+    else:
+        myrect = rect
+    screen.set_clip( rect )
+    screen.blit( myimage , myrect )
+    screen.set_clip( None )
+
+
 ALLOWABLE_CHARACTERS = u'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890()-=_+,.?"'
 
 def input_string( screen , font , redrawer = None, prompt = "Enter text below", prompt_color = (255,255,255), input_color = (240,240,50) ):
+    # Input a string from the user.
     it = []
     keep_going = True
     cursor_frame = 1

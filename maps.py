@@ -2,7 +2,7 @@ import random
 import image
 import pygame
 import pygwrap
-import backdrop
+import pickle
 
 SCREENWIDTH = 640
 SCREENHEIGHT = 480
@@ -65,7 +65,7 @@ class Map( object ):
         self.fill_terrain( 0 , 15 , height - 7 , 5 , 2 )
         self.fill_terrain( 1 , 9 , height - 8 , 4 , 1 )
 
-        self.backdrop = backdrop.Backdrop( "bg_longsunset.png" )
+        self.backdrop = image.Image( "bg_longsunset.png" )
 
     def on_the_map( self , x , y ):
         # Returns true if on the map, false otherwise
@@ -78,7 +78,7 @@ class Map( object ):
                 if self.on_the_map(x,y):
                     self.map[x][y] = terr
 
-    def render(self,screen):
+    def render(self,screen,show_special=False):
         self.backdrop.tile( screen , (self.off_x,self.off_y) )
         screen_area = screen.get_rect()
         for y in range(self.height):
@@ -174,5 +174,12 @@ class Map( object ):
 
             elif ev.type == pygame.QUIT:
                 keep_playing = False
+
+def load( fname ):
+    # Load a map file from disk.
+    f = open( "level/" + fname , "r" )
+    levelmap = pickle.load( f )
+    f.close()
+    return levelmap
 
 

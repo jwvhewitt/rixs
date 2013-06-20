@@ -9,6 +9,10 @@ import os.path
 import pickle
 import player
 
+
+TERRAIN_NEXT = {0:1,1:2,2:3,4:5,5:6,6:7,7:8,8:9,9:10,10:11,11:12,15:16,16:17,17:18,50:51,51:52,52:53,53:50,54:55,55:56,56:54}
+
+
 class MenuRedrawer( object ):
     def __init__( self , caption , screen , backdrop = "bg_kde_fractalnebula.jpg" ):
         self.caption = caption
@@ -36,6 +40,37 @@ def select_backdrop( levelmap , screen ):
     if pathname:
         dname,fname = os.path.split( pathname )
         levelmap.backdrop = image.Image( fname )
+
+def choose_terrain( levelmap , screen ):
+    # Instead of going back and forth, just pick a terrain from the sprite image.
+    keep_going = True
+
+    myrect = levelmap.sprite.bitmap.get_rect( center = ( screen.get_width() / 2 , screen.get_height() / 2 ) )
+    terrain = -1
+
+    while keep_going:
+            ev = pygwrap.wait_event()
+
+            if ev.type == pygwrap.TIMEREVENT:
+                levelmap.render( screen , show_special = True )
+                screen.blit( levelmap.sprite.bitmap , myrect )
+                pygame.display.flip()
+
+            elif ( ev.type == pygame.MOUSEBUTTONDOWN ) and myrect.collidepoint( ev.pos ):
+                x,y = ev.pos
+                x -= myrect.left
+                y -= myrect.top
+
+                terrain = x / levelmap.tile_size + ( y / levelmap.tile_size ) * 10
+
+                keep_going = False
+
+            elif ( ev.type == pygame.KEYDOWN ) and ( ev.key == pygame.K_ESCAPE ):
+                keep_going = False
+
+    return terrain
+
+
 
 def edit_map( levelmap , screen ):
     # Edit this map in place.
@@ -81,6 +116,9 @@ def edit_map( levelmap , screen ):
                         terrain = -1
                 elif ev.key == pygame.K_SPACE:
                     levelmap.map[curs_x][curs_y] = terrain
+                    if terrain in TERRAIN_NEXT:
+                        terrain = TERRAIN_NEXT[ terrain ]
+
                 elif ev.key == pygame.K_DELETE:
                     levelmap.map[curs_x][curs_y] = -1
                 elif ev.key == pygame.K_b:
@@ -93,6 +131,9 @@ def edit_map( levelmap , screen ):
                     pc = player.Player()
                     levelmap.enter( pc , screen )
                     levelmap.contents.remove( pc )
+
+                elif ev.key == pygame.K_TAB:
+                    terrain = choose_terrain( levelmap , screen )
 
                 elif ev.key == pygame.K_s:
                     if levelmap.fname == "":

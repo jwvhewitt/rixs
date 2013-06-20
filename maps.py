@@ -37,10 +37,10 @@ def set_offset( levelmap , pc ):
 
 
 class Map( object ):
-    # The tiles are packed Obstacles, Spaces, Platforms.
-    LAST_OBSTACLE = 19
-    LAST_SPACE = 39
-    LAST_PLATFORM = 49
+    # The tiles are packed Spaces, Obstacles, Platforms.
+    LAST_SPACE = 49
+    LAST_OBSTACLE = 79
+    LAST_PLATFORM = 99
 
     def __init__(self,width=20,height=14,tile_size=32,sprite_name="terr_overworld.png"):
         self.width = width
@@ -116,7 +116,7 @@ class Map( object ):
         tile_x = self.tile_x( screen_x )
         tile_y = self.tile_y( screen_y )
         if self.on_the_map( tile_x , tile_y ):
-            return ( self.map[tile_x][tile_y] != -1 ) and ( self.map[tile_x][tile_y] <= self.LAST_OBSTACLE )
+            return ( self.map[tile_x][tile_y] > self.LAST_SPACE ) and ( self.map[tile_x][tile_y] <= self.LAST_OBSTACLE )
         else:
             return True
 
@@ -124,17 +124,17 @@ class Map( object ):
         tile_x = self.tile_x( screen_x )
         tile_y = self.tile_y( screen_y )
         if self.on_the_map( tile_x , tile_y ):
-            return ( self.map[tile_x][tile_y] == -1 ) or ( ( self.map[tile_x][tile_y] > self.LAST_OBSTACLE ) and ( self.map[tile_x][tile_y] <= self.LAST_SPACE ) )
+            return self.map[tile_x][tile_y] <= self.LAST_SPACE
         else:
-            return True
+            return False
 
     def is_a_platform( self , screen_x , screen_y ):
         tile_x = self.tile_x( screen_x )
         tile_y = self.tile_y( screen_y )
         if self.on_the_map( tile_x , tile_y ):
-            return self.map[tile_x][tile_y] > self.LAST_SPACE
+            return self.map[tile_x][tile_y] > self.LAST_OBSTACLE
         else:
-            return True
+            return False
 
     def play( self , pc , screen ):
         keep_playing = True

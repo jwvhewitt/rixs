@@ -9,7 +9,7 @@ tileset "RLTiles". Some of the tiles have been modified by me.
     You can find the original tileset at:
     http://rltiles.sf.net
 
-Other graphics from Carl Olsson, obtained from opengameart.net
+Other graphics from Carl Olsson, obtained from opengameart.org
 
 The heart comes from Planet Cute:
 

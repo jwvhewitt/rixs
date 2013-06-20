@@ -37,15 +37,21 @@ def set_offset( levelmap , pc ):
 
 
 class Map( object ):
-    SPACE,OBSTACLE,PLATFORM = range(3)
+    # The tiles are packed Obstacles, Spaces, Platforms.
+    LAST_OBSTACLE = 19
+    LAST_SPACE = 39
+    LAST_PLATFORM = 49
 
-    TERRAIN_TYPE = [ OBSTACLE, PLATFORM, SPACE ]
-
-    def __init__(self,width=20,height=14,tile_size=32,sprite_name="default_terrain.png"):
+    def __init__(self,width=20,height=14,tile_size=32,sprite_name="terr_overworld.png"):
         self.width = width
         self.height = height
         self.tile_size = tile_size
         self.contents = []
+
+        # Record the start position of the PC.
+        self.pc_start_x = 5
+        self.pc_start_y = 5
+
         self.off_x = 0
         self.off_y = 0
 
@@ -54,16 +60,6 @@ class Map( object ):
             for y in range(height) ]
                 for x in range(width) ]
         self.sprite = image.Image( sprite_name , tile_size , tile_size )
-
-        self.fill_terrain( 0 , 0 , height - 2 , width , 2 )
-        self.fill_terrain( 1 , 5 , height - 4 , 10 , 1 )
-        self.map[3][height - 3] = 2
-        self.map[0][height - 3] = 0
-        self.map[0][height - 4] = 0
-
-        self.fill_terrain( 0 , 8 , height - 6 , 6 , 1 )
-        self.fill_terrain( 0 , 15 , height - 7 , 5 , 2 )
-        self.fill_terrain( 1 , 9 , height - 8 , 4 , 1 )
 
         self.backdrop = image.Image( "bg_longsunset.png" )
 
@@ -87,6 +83,11 @@ class Map( object ):
                     dest = pygame.Rect( x*self.tile_size-self.off_x , y*self.tile_size-self.off_y , self.tile_size , self.tile_size )
                     if screen_area.colliderect( dest ):
                         self.sprite.render( screen , dest, self.map[x][y] )
+                if show_special and ( self.pc_start_x == x ) and ( self.pc_start_y == y ):
+                    dest = pygame.Rect( x*self.tile_size-self.off_x , y*self.tile_size-self.off_y , self.tile_size , self.tile_size )
+                    if screen_area.colliderect( dest ):
+                        pygwrap.draw_text( screen , pygwrap.SMALLFONT , "PC" , dest , do_center = True )
+
         for t in self.contents:
             t.render( screen , self )
 
@@ -115,7 +116,7 @@ class Map( object ):
         tile_x = self.tile_x( screen_x )
         tile_y = self.tile_y( screen_y )
         if self.on_the_map( tile_x , tile_y ):
-            return self.TERRAIN_TYPE[ self.map[tile_x][tile_y] ] == self.OBSTACLE
+            return ( self.map[tile_x][tile_y] != -1 ) and ( self.map[tile_x][tile_y] <= self.LAST_OBSTACLE )
         else:
             return True
 
@@ -123,7 +124,7 @@ class Map( object ):
         tile_x = self.tile_x( screen_x )
         tile_y = self.tile_y( screen_y )
         if self.on_the_map( tile_x , tile_y ):
-            return self.TERRAIN_TYPE[ self.map[tile_x][tile_y] ] == self.SPACE
+            return ( self.map[tile_x][tile_y] == -1 ) or ( ( self.map[tile_x][tile_y] > self.LAST_OBSTACLE ) and ( self.map[tile_x][tile_y] <= self.LAST_SPACE ) )
         else:
             return True
 
@@ -131,7 +132,7 @@ class Map( object ):
         tile_x = self.tile_x( screen_x )
         tile_y = self.tile_y( screen_y )
         if self.on_the_map( tile_x , tile_y ):
-            return self.TERRAIN_TYPE[ self.map[tile_x][tile_y] ] == self.PLATFORM
+            return self.map[tile_x][tile_y] > self.LAST_SPACE
         else:
             return True
 
@@ -175,9 +176,17 @@ class Map( object ):
             elif ev.type == pygame.QUIT:
                 keep_playing = False
 
+    def enter( self , pc , screen ):
+        pc.x = self.pc_start_x * 32
+        pc.y = self.pc_start_y * 32
+        self.contents.append( pc )
+        # Start the player with a bit of bounce...
+        pc.dy = -10
+        self.play( pc , screen )
+
 def load( fname ):
     # Load a map file from disk.
-    f = open( "level/" + fname , "r" )
+    f = open( "level/" + fname , "rb" )
     levelmap = pickle.load( f )
     f.close()
     return levelmap

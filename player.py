@@ -76,6 +76,7 @@ class Player( things.LivingThing ):
                 # There's a base JUMP_SPEED value, which gets modified by horizontal
                 # speed. In other words, if you want to jump high, get a running start.
                 self.dy = -self.JUMP_SPEED - abs( self.dx / ( self.SLIDEYNESS * 3 ) )
+                self.state = self.PCS_FALLING
 
         # Handle motion now.
         # First, vertical movement- aka falling. This function will return True

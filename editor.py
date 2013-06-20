@@ -7,11 +7,12 @@ import image
 import rpgmenu
 import os.path
 import pickle
+import player
 
 class MenuRedrawer( object ):
-    def __init__( self , caption , screen ):
+    def __init__( self , caption , screen , backdrop = "bg_kde_fractalnebula.jpg" ):
         self.caption = caption
-        self.backdrop = image.Image( "bg_kde_fractalnebula.jpg" )
+        self.backdrop = image.Image( backdrop )
         self.counter = 0
 
         self.rect = pygame.Rect( screen.get_width()/2 - 200 , screen.get_height()/2 - 220, 400, 64 )
@@ -52,7 +53,7 @@ def edit_map( levelmap , screen ):
 
             if ev.type == pygwrap.TIMEREVENT:
                 levelmap.center_on( curs_x * levelmap.tile_size + 16 , curs_y * levelmap.tile_size + 16 )
-                levelmap.render( screen )
+                levelmap.render( screen , show_special = True )
                 edit_cursor.render( screen , ( screen.get_width() / 2 - 16 , screen.get_height() / 2 - 16 ) , 0 )
 
                 if terrain > -1:
@@ -84,12 +85,20 @@ def edit_map( levelmap , screen ):
                     levelmap.map[curs_x][curs_y] = -1
                 elif ev.key == pygame.K_b:
                     select_backdrop( levelmap , screen )
+                elif ev.key == pygame.K_p:
+                    levelmap.pc_start_x = curs_x
+                    levelmap.pc_start_y = curs_y
+
+                elif ev.key == pygame.K_F1:
+                    pc = player.Player()
+                    levelmap.enter( pc , screen )
+                    levelmap.contents.remove( pc )
 
                 elif ev.key == pygame.K_s:
                     if levelmap.fname == "":
                         levelmap.fname = "gorch.dat"
-                    f = open( "level/" + levelmap.fname , "w" )
-                    pickle.dump( levelmap , f )
+                    f = open( "level/" + levelmap.fname , "wb" )
+                    pickle.dump( levelmap , f , -1 )
                     f.close()
 
                 elif ev.key == pygame.K_ESCAPE:
@@ -121,5 +130,16 @@ def create_new_level( screen ):
             fname = pygwrap.input_string( screen, rpgmenu.MENUFONT, redrawer=myredraw, prompt="Enter Filename")
             the_level.fname = fname
             edit_map( the_level , screen )
+
+def edit_existing_level( screen ):
+    rpm = rpgmenu.Menu( screen , x=screen.get_width()/2 - 200 , y=screen.get_height()/2 - 130, w=400, h=300 )
+    rpm.add_files( "level/*" )
+    myredraw = MenuRedrawer( "Select Backdrop Image" , screen )
+    rpm.predraw = myredraw
+    pathname = rpm.query()
+    if pathname:
+        dname,fname = os.path.split( pathname )
+        levelmap = maps.load( fname )
+        edit_map( levelmap , screen )
 
 

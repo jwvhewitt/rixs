@@ -22,6 +22,7 @@ except ImportError:
 WRAP_BACKGROUND = None
 WRAP_BORDERS = None
 INPUT_CURSOR = None
+SMALLFONT = None
 
 TEX_WIDTH = 16
 BORDER_WIDTH = 8
@@ -215,6 +216,9 @@ def init():
         WRAP_BACKGROUND = image.Image( "sys_defbackground.png" , TEX_WIDTH , TEX_WIDTH )
         WRAP_BORDERS = image.Image( "sys_defborder.png" , BORDER_WIDTH , BORDER_WIDTH )
         INPUT_CURSOR = image.Image( "sys_textcursor.png" , 8 , 16 )
+
+        global SMALLFONT
+        SMALLFONT = pygame.font.Font( "gfx/VeraBd.ttf" , 16 )
 
         if android:
             android.init()

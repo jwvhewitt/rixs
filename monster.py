@@ -211,7 +211,7 @@ class Frog( Monster ):
     def do_ai( self , levelmap ):
         self.update_patroller( levelmap )
         self.counter += 1
-        if self.counter > 60:
+        if ( self.counter > 60 ) and not levelmap.is_a_space( self.foot_x() , self.foot_y() ):
             self.dy = -8 - random.randint( 1 , 4 )
             self.counter = random.randint( 1 , 20 )
 

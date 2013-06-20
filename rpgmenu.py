@@ -201,6 +201,7 @@ class Menu( pygame.Rect ):
         file_list = glob.glob( filepat )
         for f in file_list:
             self.add_item( f , f )
+        self.sort()
 
 def init():
     # Don't call init until after the display has been set.

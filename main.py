@@ -34,8 +34,8 @@ mymenu = rpgmenu.Menu( screen , 150 , 280 , 340 , 170 )
 mymenu.predraw = predraw
 
 mymenu.add_item( "Play Game" , 1 )
-mymenu.add_item( "Edit Map" , 2 )
-mymenu.add_item( "Test Text Input" , 3 )
+mymenu.add_item( "Create Level" , 2 )
+mymenu.add_item( "Edit Level" , 3 )
 mymenu.add_item( "Quit" , -1 )
 
 keep_going = True
@@ -47,9 +47,6 @@ while keep_going:
     if n == 1:
         the_level = maps.load( "gorch.dat" )
         pc = player.Player( x = 100, y=360 )
-        # Start the player with a bit of bounce...
-        pc.dy = -10
-        the_level.contents.append( pc )
 
         bear = monster.AcidDragon( x= 170, y=200 )
         the_level.contents.append( bear )
@@ -63,13 +60,13 @@ while keep_going:
         slime = monster.BlueSlime( x= 320, y=100 )
         the_level.contents.append( slime )
 
-        the_level.play( pc , screen )
+        the_level.enter( pc , screen )
 
     elif n == 2:
         editor.create_new_level( screen )
 
     elif n == 3:
-        a = pygwrap.input_string( screen , rpgmenu.MENUFONT , predraw )
+        editor.edit_existing_level( screen )
 
     elif n == -1:
         keep_going = False

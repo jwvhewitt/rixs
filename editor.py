@@ -10,6 +10,7 @@ import pickle
 import player
 import monster
 import copy
+import generator
 
 
 TERRAIN_NEXT = {0:1,1:2,2:3,3:0,4:5,5:6,6:7,7:8,8:9,9:10,10:11,11:12,12:4,15:16,16:17,17:18,50:51,51:52,52:53,53:50,54:55,55:56,56:54}
@@ -157,6 +158,11 @@ def edit_map( levelmap , screen ):
                     monster = select_monster( levelmap , screen )
                     if monster:
                         levelmap.contents.append( monster( x = curs_x * levelmap.tile_size , y = curs_y * levelmap.tile_size ) )
+
+                elif ev.key == pygame.K_g:
+                    monster = select_monster( levelmap , screen )
+                    if monster:
+                        levelmap.contents.append( generator.Generator(x = curs_x * levelmap.tile_size , y = curs_y * levelmap.tile_size, product=monster, number = 5) )
 
                 elif ev.key == pygame.K_s:
                     if levelmap.fname == "":

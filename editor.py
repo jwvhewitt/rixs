@@ -8,9 +8,12 @@ import rpgmenu
 import os.path
 import pickle
 import player
+import monster
+import copy
+import generator
 
 
-TERRAIN_NEXT = {0:1,1:2,2:3,4:5,5:6,6:7,7:8,8:9,9:10,10:11,11:12,15:16,16:17,17:18,50:51,51:52,52:53,53:50,54:55,55:56,56:54}
+TERRAIN_NEXT = {0:1,1:2,2:3,3:0,4:5,5:6,6:7,7:8,8:9,9:10,10:11,11:12,12:4,15:16,16:17,17:18,50:51,51:52,52:53,53:50,54:55,55:56,56:54}
 
 
 class MenuRedrawer( object ):
@@ -72,6 +75,14 @@ def choose_terrain( levelmap , screen ):
 
 
 
+def select_monster( levelmap , screen ):
+    # Bring up a menu to select a monster, then return its class.
+    rpm = rpgmenu.Menu( screen , x=screen.get_width()/2 - 200 , y=screen.get_height()/2 - 130, w=400, h=300 )
+    for m in monster.MANUAL:
+        rpm.add_item( m.NAME , m )
+    rpm.sort()
+    return rpm.query()
+
 def edit_map( levelmap , screen ):
     # Edit this map in place.
     edit_cursor = image.Image( "edit_cursors.png" , 32 , 32 )
@@ -120,7 +131,15 @@ def edit_map( levelmap , screen ):
                         terrain = TERRAIN_NEXT[ terrain ]
 
                 elif ev.key == pygame.K_DELETE:
-                    levelmap.map[curs_x][curs_y] = -1
+                    # If there's a thing in this tile, delete it.
+                    # If not, delete the map terrain.
+                    deleted_thing = False
+                    for t in levelmap.contents:
+                        if ( t.x == curs_x * levelmap.tile_size ) and ( t.y == curs_y * levelmap.tile_size ):
+                            levelmap.contents.remove( t )
+                            deleted_thing = True
+                    if not deleted_thing:
+                        levelmap.map[curs_x][curs_y] = -1
                 elif ev.key == pygame.K_b:
                     select_backdrop( levelmap , screen )
                 elif ev.key == pygame.K_p:
@@ -128,12 +147,22 @@ def edit_map( levelmap , screen ):
                     levelmap.pc_start_y = curs_y
 
                 elif ev.key == pygame.K_F1:
+                    lm2 = copy.deepcopy( levelmap )
                     pc = player.Player()
-                    levelmap.enter( pc , screen )
-                    levelmap.contents.remove( pc )
+                    lm2.enter( pc , screen )
 
                 elif ev.key == pygame.K_TAB:
                     terrain = choose_terrain( levelmap , screen )
+
+                elif ev.key == pygame.K_m:
+                    monster = select_monster( levelmap , screen )
+                    if monster:
+                        levelmap.contents.append( monster( x = curs_x * levelmap.tile_size , y = curs_y * levelmap.tile_size ) )
+
+                elif ev.key == pygame.K_g:
+                    monster = select_monster( levelmap , screen )
+                    if monster:
+                        levelmap.contents.append( generator.Generator(x = curs_x * levelmap.tile_size , y = curs_y * levelmap.tile_size, product=monster, number = 5) )
 
                 elif ev.key == pygame.K_s:
                     if levelmap.fname == "":

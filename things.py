@@ -6,7 +6,7 @@ import math
 class Thing( object ):
     # A Thing is a generic game object, i.e. the parent class of just about
     # everything else.
-    def __init__(self, x=0, y=0, width=64, height=64, sprite_name="", frame=0, topmargin=0, sidemargin=0, bottommargin=0 ):
+    def __init__(self, x=0, y=0, width=32, height=32, sprite_name="", frame=0, topmargin=0, sidemargin=0, bottommargin=0 ):
         self.x = x
         self.y = y
         self.dx = 0

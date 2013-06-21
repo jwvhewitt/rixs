@@ -5,6 +5,8 @@ import bullets
 import animob
 
 class Monster( things.LivingThing ):
+    NAME = "MONSTER"
+
     SPEED = 4
     DAMAGE = 1
     xdir = 1
@@ -116,6 +118,8 @@ class Monster( things.LivingThing ):
         self.y += self.dy
 
 class AcidDragon( Monster ):
+    NAME = "Acid Dragon"
+
     DAMAGE = 3
     SPEED = 2
     wander_now = True
@@ -165,10 +169,12 @@ class AcidDragon( Monster ):
 
 
 class BlackBear( Monster ):
+    NAME = "Black Bear"
     def __init__( self , x , y ):
         super(BlackBear, self).__init__(x,y,width=27,height=16,sprite_name="monster_blackbear.png",frame=0,topmargin=0,sidemargin=0,bottommargin=0,health=5)
 
 class BlueSlime( Monster ):
+    NAME = "Blue Slime"
     CAN_KNOCK_BACK = False
     DAMAGE = 3
     SPEED = 2
@@ -194,6 +200,7 @@ class BlueSlime( Monster ):
         levelmap.contents.append( animob.GreenSplat( self.mid_x() - 16 , self.mid_y() - 16 ))
 
 class Bat( Monster ):
+    NAME = "Bat"
     def __init__( self , x , y ):
         super(Bat, self).__init__(x,y,width=32,height=32,sprite_name="monster_bat.png",frame=0,topmargin=6,sidemargin=2,bottommargin=10,health=1)
 
@@ -202,6 +209,7 @@ class Bat( Monster ):
         self.update_flier( levelmap )
 
 class Frog( Monster ):
+    NAME = "Giant Frog"
     counter = 0
     SPEED = 3
 
@@ -214,4 +222,7 @@ class Frog( Monster ):
         if ( self.counter > 60 ) and not levelmap.is_a_space( self.foot_x() , self.foot_y() ):
             self.dy = -8 - random.randint( 1 , 4 )
             self.counter = random.randint( 1 , 20 )
+
+MANUAL = (Frog, Bat, BlueSlime, BlackBear, AcidDragon)
+
 

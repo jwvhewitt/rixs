@@ -6,7 +6,7 @@ import math
 class Thing( object ):
     # A Thing is a generic game object, i.e. the parent class of just about
     # everything else.
-    def __init__(self, x=0, y=0, width=32, height=32, sprite_name="", frame=0, topmargin=0, sidemargin=0, bottommargin=0 ):
+    def __init__(self, x=0, y=0, width=32, height=32, sprite_name="", frame=0, topmargin=0, sidemargin=0, bottommargin=0, invisible=False ):
         self.x = x
         self.y = y
         self.dx = 0
@@ -19,6 +19,7 @@ class Thing( object ):
         self.topmargin = topmargin
         self.sidemargin = sidemargin
         self.bottommargin = bottommargin
+        self.invisible = invisible
 
     def liverect( self ):
         """ return the live rectangle to be used for collision detection, etc
@@ -35,10 +36,11 @@ class Thing( object ):
     def update( self, levelmap ):
         pass
 
-    def render( self, screen, levelmap ):
-        if self.sprite == None:
-            self.sprite = image.Image( self.sprite_name , self.width , self.height )
-        self.sprite.render( screen , (self.x-levelmap.off_x,self.y-levelmap.off_y), self.frame )
+    def render( self, screen, levelmap, show_special=False ):
+        if show_special or not self.invisible:
+            if self.sprite == None:
+                self.sprite = image.Image( self.sprite_name , self.width , self.height )
+            self.sprite.render( screen , (self.x-levelmap.off_x,self.y-levelmap.off_y), self.frame )
 
     def decelerate_x( self ):
         if self.dx > 0:
@@ -61,7 +63,7 @@ class Thing( object ):
                 if levelmap.is_an_obstacle( self.foot_x(), self.foot_y() ) or levelmap.is_a_platform( self.foot_x() , self.foot_y() ):
                     # We want to land exactly at the surface of the tile, not embedded part way through it.
                     # The following formula might be magic but it works.
-                    self.y = ( self.y / levelmap.tile_size ) * levelmap.tile_size + levelmap.tile_size - ( ( self.height - self.bottommargin ) % levelmap.tile_size )
+                    self.y = ( self.foot_y() / levelmap.tile_size ) * levelmap.tile_size  - ( self.height - self.bottommargin )
                     self.dy = 0
                     has_just_landed = True
         return has_just_landed

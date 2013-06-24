@@ -24,8 +24,11 @@ class Monster( things.LivingThing ):
 
         else:
             for t in levelmap.contents:
-                if isinstance( t , player.Player ) and self.is_touching( t ):
-                    t.hurt( self.DAMAGE , self.liverect() , levelmap )
+                self.interact( levelmap , t )
+
+    def interact( self, levelmap, other ):
+        if isinstance( other , player.Player ) and self.is_touching( other ):
+            other.hurt( self.DAMAGE , self.liverect() , levelmap )
 
     def die( self , levelmap ):
         # This monster is dying. Maybe do something?
@@ -167,11 +170,34 @@ class AcidDragon( Monster ):
         # Do a big boom.
         levelmap.contents.append( animob.BigBoom( self.x + self.dx - 1 , self.y + self.dy - 1 , loop = 2 ))
 
+class AcidPool( Monster ):
+    NAME = "Acid Pool"
+    CAN_KNOCK_BACK = False
+    DAMAGE = 1
+    shield = -1
 
-class BlackBear( Monster ):
-    NAME = "Black Bear"
     def __init__( self , x , y ):
-        super(BlackBear, self).__init__(x,y,width=27,height=16,sprite_name="monster_blackbear.png",frame=0,topmargin=0,sidemargin=0,bottommargin=0,health=5)
+        super(AcidPool, self).__init__(x,y,width=32,height=32,sprite_name="monster_acid.png",frame=0,topmargin=2,sidemargin=0,bottommargin=0,health=9999)
+        self.flicker = True
+
+    def do_ai( self , levelmap ):
+        self.update_faller( levelmap )
+        if self.flicker:
+            self.frame = ( self.frame + 1 ) % 4
+        self.flicker = not self.flicker
+
+    def hit( self , levelmap ):
+        self.health = 9999
+
+    def interact( self, levelmap, other ):
+        if self.is_touching( other ):
+            if isinstance( other , GreenSlime ):
+                # Automatically send slimes back to the slime factory.
+                levelmap.contents.remove( other )
+                levelmap.contents.append( animob.GreenSplat( other.mid_x() - 16 , other.mid_y() - 16 ))
+            elif isinstance( other , things.LivingThing ):
+                other.hurt( self.DAMAGE , self.liverect() , levelmap )
+
 
 class BlueSlime( Monster ):
     NAME = "Blue Slime"
@@ -182,7 +208,7 @@ class BlueSlime( Monster ):
     counter = 0
 
     def __init__( self , x , y ):
-        super(BlueSlime, self).__init__(x,y,width=32,height=32,sprite_name="monster_slime_blue.png",frame=0,topmargin=10,sidemargin=2,bottommargin=6,health=5)
+        super(BlueSlime, self).__init__(x,y,width=32,height=32,sprite_name="monster_32px.png",frame=4,topmargin=10,sidemargin=2,bottommargin=6,health=5)
 
     def do_ai( self , levelmap ):
         if self.wander_now:
@@ -199,14 +225,28 @@ class BlueSlime( Monster ):
     def hit( self , levelmap ):
         levelmap.contents.append( animob.GreenSplat( self.mid_x() - 16 , self.mid_y() - 16 ))
 
+
 class Bat( Monster ):
     NAME = "Bat"
     def __init__( self , x , y ):
-        super(Bat, self).__init__(x,y,width=32,height=32,sprite_name="monster_bat.png",frame=0,topmargin=6,sidemargin=2,bottommargin=10,health=1)
+        super(Bat, self).__init__(x,y,width=32,height=32,sprite_name="monster_32px.png",frame=2,topmargin=6,sidemargin=2,bottommargin=10,health=1)
 
     def do_ai( self , levelmap ):
         # This is the monster's chance to act.
         self.update_flier( levelmap )
+
+class DeathYak( Monster ):
+    NAME = "Death Yak"
+    DAMAGE = 2
+    SPEED = 5
+    def __init__( self , x , y ):
+        super(DeathYak, self).__init__(x,y,width=32,height=32,sprite_name="monster_32px.png",frame=1,topmargin=5,sidemargin=1,bottommargin=2,health=8)
+
+
+class Fangwolf( Monster ):
+    NAME = "Fangwolf"
+    def __init__( self , x , y ):
+        super(Fangwolf, self).__init__(x,y,width=32,height=32,sprite_name="monster_32px.png",frame=0,topmargin=11,sidemargin=2,bottommargin=4,health=5)
 
 class Frog( Monster ):
     NAME = "Giant Frog"
@@ -214,7 +254,7 @@ class Frog( Monster ):
     SPEED = 3
 
     def __init__( self , x , y ):
-        super(Frog, self).__init__(x,y,width=32,height=32,sprite_name="monster_frog_green.png",frame=0,topmargin=4,sidemargin=2,bottommargin=5,health=5)
+        super(Frog, self).__init__(x,y,width=32,height=32,sprite_name="monster_32px.png",frame=3,topmargin=4,sidemargin=2,bottommargin=5,health=5)
 
     def do_ai( self , levelmap ):
         self.update_patroller( levelmap )
@@ -223,6 +263,89 @@ class Frog( Monster ):
             self.dy = -8 - random.randint( 1 , 4 )
             self.counter = random.randint( 1 , 20 )
 
-MANUAL = (Frog, Bat, BlueSlime, BlackBear, AcidDragon)
+class GreenSlime( Monster ):
+    NAME = "Green Slime"
+    CAN_KNOCK_BACK = False
+    DAMAGE = 1
+    SPEED = 2
+    wander_now = True
+
+    def __init__( self , x , y ):
+        super(GreenSlime, self).__init__(x,y,width=32,height=32,sprite_name="monster_32px.png",frame=5,topmargin=10,sidemargin=2,bottommargin=6,health=4)
+        self.counter = random.randint( 1 , 30 )
+
+    def do_ai( self , levelmap ):
+        if self.wander_now:
+            self.update_wanderer( levelmap )
+        else:
+            self.update_faller( levelmap )
+        self.counter += -1
+        if self.counter < 1:
+            self.wander_now = not self.wander_now
+            self.counter = random.randint( 15 , 50 )
+            if random.randint( 1 , 4 ) == 1:
+                self.xdir = 0
+
+    def hit( self , levelmap ):
+        levelmap.contents.append( animob.GreenSplat( self.mid_x() - 16 , self.mid_y() - 16 ))
+
+class KoboldGuard( Monster ):
+    NAME = "Kobold Guard"
+    DAMAGE = 1
+    SPEED = 5
+    def __init__( self , x , y ):
+        super(KoboldGuard, self).__init__(x,y,width=32,height=32,sprite_name="monster_32px.png",frame=7,topmargin=5,sidemargin=7,bottommargin=1,health=1)
+
+class KoboldFighter( Monster ):
+    NAME = "Kobold Fighter"
+    DAMAGE = 1
+    SPEED = 5
+    def __init__( self , x , y ):
+        super(KoboldFighter, self).__init__(x,y,width=32,height=32,sprite_name="monster_32px.png",frame=8,topmargin=5,sidemargin=3,bottommargin=1,health=1)
+        self.counter = 0
+    def do_ai( self , levelmap ):
+        self.update_patroller( levelmap )
+        self.counter += 1
+        if ( self.counter > 90 ) and not levelmap.is_a_space( self.foot_x() , self.foot_y() ):
+            self.dy = -8 - random.randint( 1 , 4 )
+            self.counter = random.randint( 1 , 20 )
+
+
+class Troglodyte( Monster ):
+    NAME = "Troglodyte"
+    DAMAGE = 4
+    SPEED = 3
+    CAN_KNOCK_BACK = False
+    def __init__( self , x , y ):
+        super(Troglodyte, self).__init__(x,y,width=32,height=32,sprite_name="monster_32px.png",frame=6,topmargin=3,sidemargin=1,bottommargin=4,health=25)
+
+
+class WallOfPain( Monster ):
+    NAME = "Wall of Pain"
+    CAN_KNOCK_BACK = False
+    DAMAGE = 5
+    flicker = True
+
+    def __init__( self , x , y ):
+        super(WallOfPain, self).__init__(x,y,width=32,height=64,sprite_name="monster_wall.png",frame=0,topmargin=0,sidemargin=0,bottommargin=1,health=25)
+        self.df = 1
+
+    def do_ai( self , levelmap ):
+        self.update_faller( levelmap )
+        if self.flicker:
+            self.frame += self.df
+            if ( self.frame == 0 ) or ( self.frame == 3 ):
+                self.df = -self.df
+        self.flicker = not self.flicker
+
+    def hit( self , levelmap ):
+        levelmap.contents.append( animob.EarthBoom( self.mid_x() - 16 , self.mid_y() - 16 ))
+
+    def die( self , levelmap ):
+        # Do a big boom.
+        levelmap.contents.append( animob.BigBoom( self.x + self.dx - 16 , self.y + self.dy - 1 ))
+
+
+MANUAL = (Frog, Bat, BlueSlime, Fangwolf, AcidDragon, AcidPool, WallOfPain, DeathYak, GreenSlime,Troglodyte,KoboldGuard,KoboldFighter)
 
 

@@ -89,7 +89,7 @@ class Map( object ):
                         pygwrap.draw_text( screen , pygwrap.SMALLFONT , "PC" , dest , do_center = True )
 
         for t in self.contents:
-            t.render( screen , self )
+            t.render( screen , self , show_special )
 
     def update( self ):
         for t in self.contents:

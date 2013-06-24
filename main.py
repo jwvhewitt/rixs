@@ -47,19 +47,6 @@ while keep_going:
     if n == 1:
         the_level = maps.load( "gorch.dat" )
         pc = player.Player( x = 100, y=360 )
-
-        bear = monster.AcidDragon( x= 170, y=200 )
-        the_level.contents.append( bear )
-
-        bear = monster.Frog( x= 350, y=240 )
-        the_level.contents.append( bear )
-
-        bat = monster.Bat( x= 500, y=100 )
-        the_level.contents.append( bat )
-
-        slime = monster.BlueSlime( x= 320, y=100 )
-        the_level.contents.append( slime )
-
         the_level.enter( pc , screen )
 
     elif n == 2:

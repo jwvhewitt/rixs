@@ -151,9 +151,15 @@ class Map( object ):
                 pc.render_health( screen )
                 pygame.display.flip()
 
+                if pc.health < 1:
+                    if pc.is_really_dead(self):
+                        keep_playing = False
+
             elif ev.type == pygame.KEYDOWN:
                 if ev.key == pygame.K_UP:
                     pc.move_up = True
+                elif ev.key == pygame.K_DOWN:
+                    pc.move_down = True
                 elif ev.key == pygame.K_LEFT:
                     pc.move_left = True
                 elif ev.key == pygame.K_RIGHT:
@@ -166,6 +172,8 @@ class Map( object ):
             elif ev.type == pygame.KEYUP:
                 if ev.key == pygame.K_UP:
                     pc.move_up = False
+                elif ev.key == pygame.K_DOWN:
+                    pc.move_down = False
                 elif ev.key == pygame.K_LEFT:
                     pc.move_left = False
                 elif ev.key == pygame.K_RIGHT:

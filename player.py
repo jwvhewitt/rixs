@@ -21,11 +21,19 @@ class Player( things.LivingThing ):
         self.move_right = False
         self.move_left = False
         self.move_up = False
+        self.move_down = False
         self.fire_button = False
         self.state = self.PCS_WALKING
         self.health_sprite = image.Image( "bitz_heart.png" , 22 , 22 )
+        self.equip_sprite = image.Image( "bitz_equipment.png" , 32 , 32 )
         self.fire_dir = 1
         self.recharge = 0
+        self.full_health = self.health
+        self.potions = 0
+
+        self.weapon = 0
+        self.armor = 0
+
 
     def update( self, levelmap ):
         if self.shield > 0:
@@ -99,7 +107,23 @@ class Player( things.LivingThing ):
 
     def render_health( self, screen ):
         # Draw the health bar for the PC.
-        for t in range( self.health ):
-            self.health_sprite.render( screen, ( t * self.health_sprite.frame_width + 15 , 450 ) , 0 )
+        self.equip_sprite.render( screen , ( 15 , 450 ) , self.armor )
+        self.equip_sprite.render( screen , ( 47 , 450 ) , self.weapon + 4 )
+        for t in range( self.full_health ):
+            if t < self.health:
+                self.health_sprite.render( screen, ( t * self.health_sprite.frame_width + 79 , 450 ) , 0 )
+            else:
+                self.health_sprite.render( screen, ( t * self.health_sprite.frame_width + 79 , 450 ) , 1 )
+        for t in range( self.potions ):
+            self.health_sprite.render( screen, ( 602 - t * self.health_sprite.frame_width , 450 ) , 2 )
+
+    def is_really_dead( self , levelmap ):
+        # Check to see whether of not the PC is really dead
+        if self.potions > 0:
+            self.potions -= 1
+            self.health = self.full_health
+            levelmap.contents.append( animob.Twinkle( self.mid_x() - 16 , self.mid_y() - 16 ))
+        return self.health < 1
+
 
 

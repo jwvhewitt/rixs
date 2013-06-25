@@ -11,6 +11,8 @@ import player
 import monster
 import copy
 import generator
+import items
+import usable
 
 
 TERRAIN_NEXT = {0:1,1:2,2:3,3:0,4:5,5:6,6:7,7:8,8:9,9:10,10:11,11:12,12:4,15:16,16:17,17:18,50:51,51:52,52:53,53:50,54:55,55:56,56:54}
@@ -83,6 +85,26 @@ def select_monster( levelmap , screen , prompt = "Select a Monster" ):
     # Bring up a menu to select a monster, then return its class.
     rpm = rpgmenu.Menu( screen , x=screen.get_width()/2 - 200 , y=screen.get_height()/2 - 130, w=400, h=300 )
     for m in monster.MANUAL:
+        rpm.add_item( m.NAME , m )
+    rpm.sort()
+    myredraw = MenuRedrawer( prompt , screen , levelmap = levelmap )
+    rpm.predraw = myredraw
+    return rpm.query()
+
+def select_item( levelmap , screen , prompt = "Select an Item" ):
+    # Bring up a menu to select a monster, then return its class.
+    rpm = rpgmenu.Menu( screen , x=screen.get_width()/2 - 200 , y=screen.get_height()/2 - 130, w=400, h=300 )
+    for m in items.MANUAL:
+        rpm.add_item( m.NAME , m )
+    rpm.sort()
+    myredraw = MenuRedrawer( prompt , screen , levelmap = levelmap )
+    rpm.predraw = myredraw
+    return rpm.query()
+
+def select_usable( levelmap , screen , prompt = "Select a Usable" ):
+    # Bring up a menu to select a monster, then return its class.
+    rpm = rpgmenu.Menu( screen , x=screen.get_width()/2 - 200 , y=screen.get_height()/2 - 130, w=400, h=300 )
+    for m in usable.MANUAL:
         rpm.add_item( m.NAME , m )
     rpm.sort()
     myredraw = MenuRedrawer( prompt , screen , levelmap = levelmap )
@@ -180,6 +202,16 @@ def edit_map( levelmap , screen ):
                     monster = select_monster( levelmap , screen )
                     if monster:
                         levelmap.contents.append( monster( x = curs_x * levelmap.tile_size , y = curs_y * levelmap.tile_size ) )
+
+                elif ev.key == pygame.K_i:
+                    item = select_item( levelmap , screen )
+                    if item:
+                        levelmap.contents.append( item( x = curs_x * levelmap.tile_size , y = curs_y * levelmap.tile_size ) )
+
+                elif ev.key == pygame.K_u:
+                    item = select_usable( levelmap , screen )
+                    if item:
+                        levelmap.contents.append( item( x = curs_x * levelmap.tile_size , y = curs_y * levelmap.tile_size ) )
 
                 elif ev.key == pygame.K_g:
                     monster = select_monster( levelmap , screen , prompt = "Select Monster to Generate" )

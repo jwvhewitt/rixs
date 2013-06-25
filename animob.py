@@ -38,9 +38,18 @@ class BlueBoom( AnimOb ):
     def __init__(self, x=0, y=0, loop=0 ):
         super(BlueBoom, self).__init__(x,y,32,32,"fx_damage.png",6,8,1,loop)
 
+class DownArrow( AnimOb ):
+    def __init__(self, x=0, y=0, loop=0 ):
+        super(DownArrow, self).__init__(x,y,32,32,"fx_downarrow.png",0,3,1,loop)
+
 class EarthBoom( AnimOb ):
     def __init__(self, x=0, y=0, loop=0 ):
         super(EarthBoom, self).__init__(x,y,32,32,"fx_damage.png",18,20,1,loop)
+
+class EquipUp( AnimOb ):
+    def __init__(self, x=0, y=0, loop=0, frame=0 ):
+        super(EquipUp, self).__init__(x,y,32,32,"bitz_equipment.png",frame,frame,15,loop)
+        self.dy = -2
 
 class GreenBoom( AnimOb ):
     def __init__(self, x=0, y=0, loop=0 ):
@@ -65,6 +74,14 @@ class SmallBoom( AnimOb ):
 class Sonic( AnimOb ):
     def __init__(self, x=0, y=0, loop=0 ):
         super(Sonic, self).__init__(x,y,32,32,"fx_damage.png",24,26,1,loop)
+
+class Twinkle( AnimOb ):
+    def __init__(self, x=0, y=0, loop=0 ):
+        super(Twinkle, self).__init__(x,y,32,32,"fx_gervais_spells2.png",16,23,1,loop)
+
+class YellowSparkle( AnimOb ):
+    def __init__(self, x=0, y=0, loop=0 ):
+        super(YellowSparkle, self).__init__(x,y,32,32,"fx_gervais_spells1.png",0,7,1,loop)
 
 class Zap( AnimOb ):
     def __init__(self, x=0, y=0, loop=0 ):

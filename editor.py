@@ -138,7 +138,7 @@ def edit_map( levelmap , screen ):
                 levelmap.center_on( curs_x * levelmap.tile_size + 16 , curs_y * levelmap.tile_size + 16 )
                 levelmap.render( screen , show_special = True )
                 edit_cursor.render( screen , ( screen.get_width() / 2 - 16 , screen.get_height() / 2 - 16 ) , 0 )
-                pygwrap.draw_text( screen , pygwrap.SMALLFONT , str( curs_x ) + "," + str( curs_y ) , pygame.Rect( 8 , 42 , 64 , 32 ) )
+                pygwrap.draw_text( screen , pygwrap.SMALLFONT , str( curs_x ) + "," + str( curs_y ) + '  things:' + str( len( levelmap.contents ) ) , pygame.Rect( 8 , 42 , 256 , 32 ) )
 
                 if terrain > -1:
                     levelmap.sprite.render( screen , ( 8 , 8 ) , terrain )

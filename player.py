@@ -41,6 +41,12 @@ class Player( things.LivingThing ):
         if self.recharge > 0:
             self.recharge += -1
 
+        if self.move_right:
+            self.fire_dir = 1
+        elif self.move_left:
+            self.fire_dir = -1
+
+
         if self.fire_button and ( self.recharge == 0 ):
             levelmap.contents.append( self.ATTACK_TYPE( self.x + self.dx , self.y , self.fire_dir ) )
             self.recharge = self.RECHARGE_LENGTH
@@ -68,13 +74,11 @@ class Player( things.LivingThing ):
             if self.move_right:
                 if self.dx < ( self.MAX_PC_SPEED * self.SLIDEYNESS ):
                     self.dx += 1
-                    self.fire_dir = 1
                 elif self.dx > ( self.MAX_PC_SPEED * self.SLIDEYNESS ):
                     self.dx += -1
             elif self.move_left:
                 if -self.dx < ( self.MAX_PC_SPEED * self.SLIDEYNESS ):
                     self.dx += -1
-                    self.fire_dir = -1
                 elif -self.dx > ( self.MAX_PC_SPEED * self.SLIDEYNESS ):
                     self.dx += 1
             else:

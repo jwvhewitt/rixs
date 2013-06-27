@@ -77,11 +77,11 @@ class Sonic( AnimOb ):
 
 class Twinkle( AnimOb ):
     def __init__(self, x=0, y=0, loop=0 ):
-        super(Twinkle, self).__init__(x,y,32,32,"fx_gervais_spells2.png",16,23,1,loop)
+        super(Twinkle, self).__init__(x,y,31,31,"fx_gervais_spells2.png",16,23,1,loop)
 
 class YellowSparkle( AnimOb ):
     def __init__(self, x=0, y=0, loop=0 ):
-        super(YellowSparkle, self).__init__(x,y,32,32,"fx_gervais_spells1.png",0,7,1,loop)
+        super(YellowSparkle, self).__init__(x,y,31,31,"fx_gervais_spells1.png",0,7,1,loop)
 
 class Zap( AnimOb ):
     def __init__(self, x=0, y=0, loop=0 ):
